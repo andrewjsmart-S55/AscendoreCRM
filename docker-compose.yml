@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  ascendore-crm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ascendore-crm-api
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      API_VERSION: v1
+
+      # Database configuration (connects to Overlord's PostgreSQL)
+      DB_HOST: host.docker.internal
+      DB_PORT: 5432
+      DB_NAME: overlord
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+
+      # JWT configuration (from Overlord)
+      JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
+      JWT_EXPIRES_IN: 7d
+
+      # CORS configuration
+      CORS_ORIGIN: http://localhost:3000,http://localhost:3001
+
+      # AI Services (Anthropic Claude)
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      ANTHROPIC_MODEL: claude-3-5-sonnet-20241022
+
+      # Logging
+      LOG_LEVEL: info
+
+      # Feature flags
+      ENABLE_AI_FEATURES: true
+
+    # Connect to Overlord network to access shared services
+    networks:
+      - overlord-network
+
+    depends_on:
+      - postgres
+
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  # Reference to Overlord's PostgreSQL (external)
+  postgres:
+    image: postgres:15-alpine
+    container_name: overlord-postgres-shared
+    external_links:
+      - overlord-postgres
+    networks:
+      - overlord-network
+
+networks:
+  overlord-network:
+    external: true
+    name: overlord-network
