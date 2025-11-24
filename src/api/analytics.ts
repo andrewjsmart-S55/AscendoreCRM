@@ -3,8 +3,13 @@ import { getPool } from '../database/connection';
 import { asyncHandler } from '../middleware/errorHandler';
 import { authenticate, AuthRequest } from '../middleware/auth';
 
-export const analyticsRouter = Router();
 
+
+
+export const analyticsRouter = Router();
+// 
+
+// Enable authentication for all routes
 analyticsRouter.use(authenticate);
 
 /**
@@ -59,11 +64,11 @@ analyticsRouter.get(
       `SELECT
         a.*,
         u.email as user_email,
-        p.name as user_name
+        CONCAT(u.first_name, ' ', u.last_name) as user_name
       FROM public.crm_activities a
-      LEFT JOIN auth.users u ON a.user_id = u.id
-      LEFT JOIN public.profiles p ON a.user_id = p.id
-      WHERE a.organization_id = $1
+      LEFT JOIN public.users u ON a.user_id = u.id
+
+      WHERE a.company_id = $1
       ORDER BY a.created_at DESC
       LIMIT 10`,
       [req.user!.organization!.id]
@@ -136,9 +141,9 @@ analyticsRouter.get(
         COUNT(*) as deals_won,
         SUM(d.amount) as total_revenue
       FROM public.crm_deals d
-      INNER JOIN auth.users u ON d.owner_id = u.id
-      LEFT JOIN public.profiles p ON u.id = p.id
-      WHERE d.organization_id = $1 AND d.stage = 'closed_won' AND d.deleted_at IS NULL
+      INNER JOIN public.users u ON d.owner_id = u.id
+
+      WHERE d.company_id = $1 AND d.stage = 'closed_won' AND d.deleted_at IS NULL
       GROUP BY u.id, u.email, p.name
       ORDER BY total_revenue DESC
       LIMIT 10`,
@@ -197,7 +202,7 @@ analyticsRouter.get(
         COUNT(CASE WHEN cc.status = 'clicked' THEN 1 END) as clicked_count
       FROM public.crm_campaigns c
       LEFT JOIN public.crm_campaign_contacts cc ON c.id = cc.campaign_id
-      WHERE c.organization_id = $1 AND c.deleted_at IS NULL
+      WHERE c.company_id = $1 AND c.deleted_at IS NULL
       GROUP BY c.id, c.name, c.campaign_type, c.status, c.budget, c.actual_cost
       ORDER BY c.created_at DESC
       LIMIT 20`,

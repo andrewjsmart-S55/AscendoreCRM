@@ -3,8 +3,13 @@ import { getPool } from '../database/connection';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { authenticate, AuthRequest } from '../middleware/auth';
 
-export const activitiesRouter = Router();
 
+
+
+export const activitiesRouter = Router();
+// 
+
+// Enable authentication for all routes
 activitiesRouter.use(authenticate);
 
 /**
@@ -19,7 +24,7 @@ activitiesRouter.get(
     const limit = req.query.limit ? Number(req.query.limit) : 50;
     const offset = (page - 1) * limit;
 
-    const conditions: string[] = ['organization_id = $1'];
+    const conditions: string[] = ['company_id = $1'];
     const params: any[] = [req.user!.organization!.id];
     let paramCount = 1;
 
@@ -59,10 +64,10 @@ activitiesRouter.get(
       `SELECT
         a.*,
         u.email as user_email,
-        p.name as user_name
+        CONCAT(u.first_name, ' ', u.last_name) as user_name
       FROM public.crm_activities a
-      LEFT JOIN auth.users u ON a.user_id = u.id
-      LEFT JOIN public.profiles p ON a.user_id = p.id
+      LEFT JOIN public.users u ON a.user_id = u.id
+
       WHERE ${whereClause}
       ORDER BY a.created_at DESC
       LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`,
@@ -95,11 +100,11 @@ activitiesRouter.get(
       `SELECT
         a.*,
         u.email as user_email,
-        p.name as user_name
+        CONCAT(u.first_name, ' ', u.last_name) as user_name
       FROM public.crm_activities a
-      LEFT JOIN auth.users u ON a.user_id = u.id
-      LEFT JOIN public.profiles p ON a.user_id = p.id
-      WHERE a.organization_id = $1
+      LEFT JOIN public.users u ON a.user_id = u.id
+
+      WHERE a.company_id = $1
       ORDER BY a.created_at DESC
       LIMIT $2`,
       [req.user!.organization!.id, limit]

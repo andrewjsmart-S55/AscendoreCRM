@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from './errorHandler';
+import { AuthService } from '../services/authService';
+import { getPool } from '../database/connection';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -17,8 +19,7 @@ export interface AuthRequest extends Request {
 
 /**
  * Authentication middleware
- * This should integrate with Overlord's JWT authentication
- * For now, we'll create a basic version that can be enhanced
+ * Verifies JWT token and loads user + organization data
  */
 export const authenticate = async (
   req: AuthRequest,
@@ -34,21 +35,24 @@ export const authenticate = async (
 
     const token = authHeader.substring(7);
 
-    // TODO: Integrate with Overlord's JWT verification
-    // For now, this is a placeholder
-    // In production, this should verify the JWT using the same secret as Overlord
+    // Verify JWT token
+    const pool = getPool();
+    const authService = new AuthService(pool);
 
-    // Placeholder user data
-    // In production, decode JWT and fetch user + organization data
+    const payload = authService.verifyToken(token);
+
+    // Get full user data with organization
+    const userData = await authService.getUserById(payload.user.id);
+
+    if (!userData) {
+      throw new AppError('User not found or inactive', 401);
+    }
+
+    // Attach user data to request
     req.user = {
-      id: 'placeholder-user-id',
-      email: 'user@example.com',
-      organization: {
-        id: 'placeholder-org-id',
-        name: 'Example Organization',
-        tier: 'pro',
-        member_role: 'admin',
-      },
+      id: userData.user.id,
+      email: userData.user.email,
+      organization: userData.organization,
     };
 
     next();

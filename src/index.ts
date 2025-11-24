@@ -7,6 +7,7 @@ import { logger } from './utils/logger';
 import { errorHandler } from './middleware/errorHandler';
 
 // Import routers
+import { authRouter } from './api/auth';
 import { companiesRouter } from './api/companies';
 import { contactsRouter } from './api/contacts';
 import { dealsRouter } from './api/deals';
@@ -48,7 +49,11 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API Routes - all prefixed with /api/v1/a-crm
+// API Routes
+// Auth routes (no a-crm prefix)
+app.use(`/api/${API_VERSION}/auth`, authRouter);
+
+// CRM routes - all prefixed with /api/v1/a-crm
 const API_PREFIX = `/api/${API_VERSION}/a-crm`;
 
 app.use(`${API_PREFIX}/companies`, companiesRouter);

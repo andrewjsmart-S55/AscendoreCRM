@@ -3,8 +3,13 @@ import { getPool } from '../database/connection';
 import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { authenticate, AuthRequest } from '../middleware/auth';
 
-export const searchRouter = Router();
 
+
+
+export const searchRouter = Router();
+// 
+
+// Enable authentication for all routes
 searchRouter.use(authenticate);
 
 /**

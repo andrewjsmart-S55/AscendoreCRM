@@ -1,6 +1,6 @@
 /**
  * CRM Type Definitions for AscendoreCRM
- * Leverages Overlord Platform multi-tenancy
+ * Standalone multi-tenancy using companies
  */
 
 // ============================================================================
@@ -155,8 +155,8 @@ export interface BaseEntity {
   deleted_at?: Date | null;
 }
 
-export interface OrganizationScoped {
-  organization_id: string;
+export interface CompanyScoped {
+  company_id: string;
 }
 
 export interface Taggable {
@@ -172,7 +172,7 @@ export interface OwnedEntity {
 // CRM COMPANY
 // ============================================================================
 
-export interface CrmCompany extends BaseEntity, OrganizationScoped, Taggable, OwnedEntity {
+export interface CrmCompany extends BaseEntity, CompanyScoped, Taggable, OwnedEntity {
   name: string;
   slug?: string | null;
   industry?: string | null;
@@ -222,8 +222,8 @@ export interface UpdateCrmCompanyInput {
 // CRM CONTACT
 // ============================================================================
 
-export interface CrmContact extends BaseEntity, OrganizationScoped, Taggable, OwnedEntity {
-  company_id?: string | null;
+export interface CrmContact extends BaseEntity, CompanyScoped, Taggable, OwnedEntity {
+  crm_company_id?: string | null;
   first_name: string;
   last_name: string;
   email?: string | null;
@@ -240,7 +240,7 @@ export interface CrmContact extends BaseEntity, OrganizationScoped, Taggable, Ow
 }
 
 export interface CreateCrmContactInput {
-  company_id?: string;
+  crm_company_id?: string;
   first_name: string;
   last_name: string;
   email?: string;
@@ -259,7 +259,7 @@ export interface CreateCrmContactInput {
 }
 
 export interface UpdateCrmContactInput {
-  company_id?: string;
+  crm_company_id?: string;
   first_name?: string;
   last_name?: string;
   email?: string;
@@ -281,8 +281,8 @@ export interface UpdateCrmContactInput {
 // CRM DEAL
 // ============================================================================
 
-export interface CrmDeal extends BaseEntity, OrganizationScoped, Taggable, OwnedEntity {
-  company_id?: string | null;
+export interface CrmDeal extends BaseEntity, CompanyScoped, Taggable, OwnedEntity {
+  crm_company_id?: string | null;
   primary_contact_id?: string | null;
   name: string;
   description?: string | null;
@@ -298,7 +298,7 @@ export interface CrmDeal extends BaseEntity, OrganizationScoped, Taggable, Owned
 }
 
 export interface CreateCrmDealInput {
-  company_id?: string;
+  crm_company_id?: string;
   primary_contact_id?: string;
   name: string;
   description?: string;
@@ -314,7 +314,7 @@ export interface CreateCrmDealInput {
 }
 
 export interface UpdateCrmDealInput {
-  company_id?: string;
+  crm_company_id?: string;
   primary_contact_id?: string;
   name?: string;
   description?: string;
@@ -335,7 +335,7 @@ export interface UpdateCrmDealInput {
 // CRM CAMPAIGN
 // ============================================================================
 
-export interface CrmCampaign extends BaseEntity, OrganizationScoped, Taggable, OwnedEntity {
+export interface CrmCampaign extends BaseEntity, CompanyScoped, Taggable, OwnedEntity {
   name: string;
   description?: string | null;
   campaign_type: CampaignType;
@@ -387,8 +387,8 @@ export interface UpdateCrmCampaignInput {
 // CRM PROJECT
 // ============================================================================
 
-export interface CrmProject extends BaseEntity, OrganizationScoped, Taggable, OwnedEntity {
-  company_id?: string | null;
+export interface CrmProject extends BaseEntity, CompanyScoped, Taggable, OwnedEntity {
+  crm_company_id?: string | null;
   deal_id?: string | null;
   name: string;
   description?: string | null;
@@ -404,7 +404,7 @@ export interface CrmProject extends BaseEntity, OrganizationScoped, Taggable, Ow
 }
 
 export interface CreateCrmProjectInput {
-  company_id?: string;
+  crm_company_id?: string;
   deal_id?: string;
   name: string;
   description?: string;
@@ -420,7 +420,7 @@ export interface CreateCrmProjectInput {
 }
 
 export interface UpdateCrmProjectInput {
-  company_id?: string;
+  crm_company_id?: string;
   deal_id?: string;
   name?: string;
   description?: string;
@@ -441,7 +441,7 @@ export interface UpdateCrmProjectInput {
 // CRM TASK
 // ============================================================================
 
-export interface CrmTask extends BaseEntity, OrganizationScoped, Taggable {
+export interface CrmTask extends BaseEntity, CompanyScoped, Taggable {
   title: string;
   description?: string | null;
   related_to_type?: RelatedToType | null;
@@ -491,7 +491,7 @@ export interface UpdateCrmTaskInput {
 
 export interface CrmActivity {
   id: string;
-  organization_id: string;
+  company_id: string;
   activity_type: string;
   entity_type: string;
   entity_id: string;
@@ -513,7 +513,7 @@ export interface CreateCrmActivityInput {
 // CRM NOTE
 // ============================================================================
 
-export interface CrmNote extends BaseEntity, OrganizationScoped {
+export interface CrmNote extends BaseEntity, CompanyScoped {
   content: string;
   related_to_type?: string | null;
   related_to_id?: string | null;
@@ -583,7 +583,7 @@ export interface CompanyFilters extends PaginationParams {
 }
 
 export interface ContactFilters extends PaginationParams {
-  company_id?: string;
+  crm_company_id?: string;
   contact_status?: ContactStatus;
   lead_source?: string;
   owner_id?: string;
@@ -594,7 +594,7 @@ export interface ContactFilters extends PaginationParams {
 }
 
 export interface DealFilters extends PaginationParams {
-  company_id?: string;
+  crm_company_id?: string;
   stage?: DealStage;
   owner_id?: string;
   min_amount?: number;
@@ -613,7 +613,7 @@ export interface CampaignFilters extends PaginationParams {
 }
 
 export interface ProjectFilters extends PaginationParams {
-  company_id?: string;
+  crm_company_id?: string;
   deal_id?: string;
   project_status?: ProjectStatus;
   priority?: Priority;

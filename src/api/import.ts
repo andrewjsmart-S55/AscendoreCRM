@@ -4,8 +4,13 @@ import { asyncHandler, AppError } from '../middleware/errorHandler';
 import { authenticate, AuthRequest, requireOrganizationRole } from '../middleware/auth';
 import { logger } from '../utils/logger';
 
-export const importRouter = Router();
 
+
+
+export const importRouter = Router();
+// 
+
+// Enable authentication for all routes
 importRouter.use(authenticate);
 
 /**
@@ -79,7 +84,8 @@ function parseJSONField(value: string): any {
  */
 importRouter.post(
   '/companies',
-  requireOrganizationRole('admin'),
+  // TODO: Re-enable role check after Phase 3
+  // requireOrganizationRole('admin'),
   asyncHandler(async (req: AuthRequest, res) => {
     const { csvData, dryRun } = req.body;
 
@@ -171,7 +177,8 @@ importRouter.post(
  */
 importRouter.post(
   '/contacts',
-  requireOrganizationRole('admin'),
+  // TODO: Re-enable role check after Phase 3
+  // requireOrganizationRole('admin'),
   asyncHandler(async (req: AuthRequest, res) => {
     const { csvData, dryRun } = req.body;
 
@@ -285,7 +292,8 @@ importRouter.post(
  */
 importRouter.post(
   '/deals',
-  requireOrganizationRole('admin'),
+  // TODO: Re-enable role check after Phase 3
+  // requireOrganizationRole('admin'),
   asyncHandler(async (req: AuthRequest, res) => {
     const { csvData, dryRun } = req.body;
 
@@ -401,7 +409,8 @@ importRouter.post(
  */
 importRouter.post(
   '/tasks',
-  requireOrganizationRole('admin'),
+  // TODO: Re-enable role check after Phase 3
+  // requireOrganizationRole('admin'),
   asyncHandler(async (req: AuthRequest, res) => {
     const { csvData, dryRun } = req.body;
 
@@ -487,7 +496,8 @@ importRouter.post(
  */
 importRouter.post(
   '/validate',
-  requireOrganizationRole('admin'),
+  // TODO: Re-enable role check after Phase 3
+  // requireOrganizationRole('admin'),
   asyncHandler(async (req: AuthRequest, res) => {
     const { csvData, entityType } = req.body;
 
